@@ -53,18 +53,23 @@ class Graph
         {
             created->pointers[i] = NULL;
         }
-        start, root, before = created;
+        start = created;
+        root = created;
+        before = created;
+        cout << "---------------------------------------------------------------" << endl;
+        cout << "                 Создан граф с адресом {{"  << created << "}}" << endl;
+        cout << "---------------------------------------------------------------" << endl;
     };
 
     void fillGraph(class Node* graph);
     int amount(class Node* graph);
-    void addGraph();
-    void insertGraph();
+    void addGraphToStart();
+    void addGraphToRoot();
     void removeGraph(class Node* node);
     void clearGraphs(class Node* node);
     void changePosition();
     void getValue();
-    void insert(struct Node* root, struct Node* child);
+    void clearPointers(class Node* deletedRoot);
 
     ~Graph()
     {
@@ -124,7 +129,26 @@ int Graph :: amount(class Node* graph)
     return count;
 }
 
-void Graph :: addGraph()
+void Graph :: addGraphToStart()
+{
+    class Node* fresh = new Node;
+    this->fillGraph(fresh);
+
+    for (int i = 0; i < 10; i++)
+    {
+        if (this->start->pointers[i] == NULL)
+        {
+            this->start->pointers[i] = fresh;
+            break;
+        }
+        if (i == 9)
+        {
+            cout << "Добавление не возможно достигнуто максимальное количество дочерних графов!" << endl;    
+        }
+    }
+}
+
+void Graph :: addGraphToRoot()
 {
     class Node* fresh = new Node;
     this->fillGraph(fresh);
@@ -175,10 +199,26 @@ void Graph :: changePosition()
         cout << "---------------------------------------------------------------" << endl;
         cout << "       У графа нет дочерних элементов переход не возможен!"      << endl;
         cout << "---------------------------------------------------------------" << endl;
+        cout << "Вы хотите вернуться в начало графа('y' - да, 'n' - нет)?" << endl;
+        string answer;
+        cin >> answer;
+        if (answer == "y")
+        {
+            this->root = this->start;
+            cout << "Вы успешно переместились в начало графа!" << endl;
+        }
+        else if (answer == "n")
+        {
+            cout << "Ну нет, так нет";
+        }
+        else
+        {
+            cout << "Введено не корректное значение!" << endl;
+        }
     }
     else if (countChildren == 1)
     {
-        cout << "У графа 1 дочерний элемент, перейти к нему('y' - да, 'n' - нет):" << endl;
+        cout << "У графа 1 дочерний элемент, перейти к нему('y' - да, 'n' - нет, '1' - Вернуться в начало гарфа):" << endl;
         string answer;
         cin >> answer;
         if (answer == "y") 
@@ -193,6 +233,11 @@ void Graph :: changePosition()
         {
             cout << "Ну нет, так нет";
         }
+        else if (answer == "1")
+        {
+            this->root = this->start;
+            cout << "Вы успешно переместились в начало графа!" << endl;
+        }
         else
         {
             cout << "Введено не корректное значение!" << endl;
@@ -201,6 +246,7 @@ void Graph :: changePosition()
     else
     {
         int answer = 0;
+        int i1 = 0;
         cout << "---------------------------------------------------------------" << endl;
         cout << "Выберите Граф к которому хотите перейти, всего дочерних графов = " << countChildren << endl;
         cout << "---------------------------------------------------------------" << endl;
@@ -209,18 +255,35 @@ void Graph :: changePosition()
         for (int i = 0; i < countChildren; i++)
         {
             cout << i+1 << ")" << root->pointers[i] << endl;
+            if (i + 1 == countChildren)
+            {
+                i1 = i + 2;
+            }
         }
+        cout << i1 << ")" << "Вернуться в начало" << endl;
         cout << "---------------------------------------------------------------" << endl;
         cout << "Выберите граф: ";
         cin >> answer;
         
         if (answer > 0 && answer <= countChildren)
         {
-            cout << "---------------------------------------------------------------" << endl;
-            cout << "               Вы успешно поменяли граф!" << endl;
-            cout << "---------------------------------------------------------------" << endl;
-            this->root = this->root->pointers[answer-1];
-            countChildren = 0;
+            if (answer == i1)
+            {
+                this->root = this->start;
+                cout << "Вы успешно переместились в начало графа!" << endl;
+            }
+            else {
+                cout << "---------------------------------------------------------------" << endl;
+                cout << "               Вы успешно поменяли граф!" << endl;
+                cout << "---------------------------------------------------------------" << endl;
+                this->root = this->root->pointers[answer-1];
+                countChildren = 0;
+            }
+        }
+        else if (answer == i1)
+        {
+            this->root = this->start;
+            cout << "Вы успешно переместились в начало графа!" << endl;
         }
         else
         {
@@ -255,68 +318,6 @@ void Graph :: clearGraphs(class Node* node)
     delete node;
 }
 
-void Graph :: insert(struct Node* root, struct Node* child)
-{
-    root->typeAnimal = child->typeAnimal;
-    root->race = child->race;
-    root->name = child->name;
-    root->mainColor = child->mainColor;
-    root->gender = child->gender;
-}
-
-void Graph :: insertGraph()
-{
-    int countChildren = 0;
-    for (int i = 0; i < 10; i++)
-    {
-        if (this->root->pointers[i] != NULL)
-        {
-            countChildren++;
-        }
-    }
-    if (countChildren == 0)
-    {
-        cout << "---------------------------------------------------------------" << endl;
-        cout << "      У графа нет дочерних элементов вставка невозможна!" << endl;
-        cout << "---------------------------------------------------------------" << endl;
-    }
-    else if (countChildren == 1)
-    {
-        cout << "У графа один дочерний элемент выполнить вставку('y' - да, 'n' - нет)?" << endl;
-        string answer;
-        cin >> answer;
-        if (answer == "y")
-        {
-            insert(this->root, this->root->pointers[0]);
-        }
-        else if (answer == "n") 
-        {
-            cout << "Ну нет, дак нет" << endl;
-        }
-        else 
-        {
-            cout << "Не корректно введенные данные" << endl;
-        }
-    }
-    else if (countChildren > 1)
-    {
-        cout << "---------------------------------------------------------------" << endl;
-        cout << "       У графа " << countChildren << "дочерних элементов   ";
-        cout << "---------------------------------------------------------------" << endl;
-
-        cout << "---------------------------------------------------------------" << endl;
-        for (int i = 0; i < countChildren; i++)
-        {
-            cout << i+1 << ")" << root->pointers[i] << endl;
-        }
-        cout << "---------------------------------------------------------------" << endl;
-        cout << "Выберите граф: ";
-        int answer = 0;
-        cin >> answer;
-        insert(root, root->pointers[answer-1]);
-    }
-}
-
 void printTools()
 {
     cout << endl;
@@ -342,3 +343,76 @@ int getTools()
     cin >> numberTool;
     return numberTool;
 }
+
+void Graph :: clearPointers(class Node* deletedRoot)
+{
+    for (int i = 0; i < 10; i++)
+    {
+        if (before->pointers[i] == deletedRoot)
+        {
+            before->pointers[i] = NULL;
+        }
+    }
+}
+
+// void Graph :: insert(struct Node* root, struct Node* child)
+// {
+//     root->typeAnimal = child->typeAnimal;
+//     root->race = child->race;
+//     root->name = child->name;
+//     root->mainColor = child->mainColor;
+//     root->gender = child->gender;
+// }
+
+// void Graph :: insertGraph()
+// {
+//     int countChildren = 0;
+//     for (int i = 0; i < 10; i++)
+//     {
+//         if (this->root->pointers[i] != NULL)
+//         {
+//             countChildren++;
+//         }
+//     }
+//     if (countChildren == 0)
+//     {
+//         cout << "---------------------------------------------------------------" << endl;
+//         cout << "      У графа нет дочерних элементов вставка невозможна!" << endl;
+//         cout << "---------------------------------------------------------------" << endl;
+//     }
+//     else if (countChildren == 1)
+//     {
+//         cout << "У графа один дочерний элемент выполнить вставку('y' - да, 'n' - нет)?" << endl;
+//         string answer;
+//         cin >> answer;
+//         if (answer == "y")
+//         {
+//             insert(this->root, this->root->pointers[0]);
+//         }
+//         else if (answer == "n") 
+//         {
+//             cout << "Ну нет, дак нет" << endl;
+//         }
+//         else 
+//         {
+//             cout << "Не корректно введенные данные" << endl;
+//         }
+//     }
+//     else if (countChildren > 1)
+//     {
+//         cout << "---------------------------------------------------------------" << endl;
+//         cout << "       У графа " << countChildren << "дочерних элементов   ";
+//         cout << "---------------------------------------------------------------" << endl;
+
+//         cout << "---------------------------------------------------------------" << endl;
+//         for (int i = 0; i < countChildren; i++)
+//         {
+//             cout << i+1 << ")" << root->pointers[i] << endl;
+//         }
+//         cout << "---------------------------------------------------------------" << endl;
+//         cout << "Выберите граф: ";
+//         int answer = 0;
+//         cin >> answer;
+//         insert(root, root->pointers[answer-1]);
+//     }
+// }
